@@ -37,7 +37,10 @@ export const youtubeUnofficialProvider: TranscriptProvider = {
       kind?: string;
     };
     if (res.status === 403 && body.error === "disabled") {
-      throw new TranscriptionError("provider_disabled", "이 서버에서는 공개 자막 가져오기가 비활성화되어 있습니다.");
+      throw new TranscriptionError(
+        "provider_disabled",
+        "이 서버에서는 공개 자막 가져오기가 비활성화되어 있습니다.",
+      );
     }
     if (!res.ok || !body.vtt) {
       throw new TranscriptionError(

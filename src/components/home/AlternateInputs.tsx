@@ -19,11 +19,15 @@ export function AlternateInputs({ collectionId }: { collectionId?: string } = {}
   const [open, setOpen] = useState<Panel>(null);
   return (
     <div>
-      <div className="flex flex-wrap items-center gap-x-1 gap-y-1 text-[0.875rem] text-muted">
-        <span className="mr-2">또는</span>
+      <div className="flex flex-col items-start gap-y-0.5 text-[0.875rem] text-muted sm:flex-row sm:flex-wrap sm:items-center">
+        <span className="mb-1 sm:mb-0 sm:mr-3">또는</span>
         {ITEMS.map((item, i) => (
           <span key={item.key} className="flex items-center">
-            {i > 0 && <span aria-hidden className="mx-2 text-rule">/</span>}
+            {i > 0 && (
+              <span aria-hidden className="mx-2.5 hidden text-rule sm:inline">
+                /
+              </span>
+            )}
             <button
               type="button"
               aria-expanded={open === item.key}
@@ -75,7 +79,8 @@ function MediaPanel({ collectionId }: { collectionId?: string }) {
       >
         <p className="serif text-[1.0625rem] text-ink">음성이나 영상 파일을 이곳에 놓아 주세요</p>
         <p className="max-w-md text-[0.8125rem] leading-relaxed text-muted">
-          음성 인식은 이 기기 안에서 실행되며 파일은 외부로 전송되지 않습니다. 처음 한 번 음성 인식 모델을 내려받습니다.
+          음성 인식은 이 기기 안에서 실행되며 파일은 외부로 전송되지 않습니다. 처음 한 번 음성 인식 모델을
+          내려받습니다.
         </p>
       </Dropzone>
       {error && <Notice tone="danger">{error}</Notice>}
@@ -113,7 +118,15 @@ function CaptionPanel({ collectionId }: { collectionId?: string }) {
   );
 }
 
-export function PastePanel({ collectionId, recordId, onDone }: { collectionId?: string; recordId?: string; onDone?: () => void }) {
+export function PastePanel({
+  collectionId,
+  recordId,
+  onDone,
+}: {
+  collectionId?: string;
+  recordId?: string;
+  onDone?: () => void;
+}) {
   const router = useRouter();
   const [text, setText] = useState("");
   const [title, setTitle] = useState("");
@@ -125,7 +138,12 @@ export function PastePanel({ collectionId, recordId, onDone }: { collectionId?: 
         e.preventDefault();
         setError(null);
         try {
-          const res = await importText({ content: text, title: title.trim() || undefined, recordId, collectionId });
+          const res = await importText({
+            content: text,
+            title: title.trim() || undefined,
+            recordId,
+            collectionId,
+          });
           if (onDone) onDone();
           else router.push(`/record/${res.recordId}`);
         } catch (err) {
@@ -138,7 +156,12 @@ export function PastePanel({ collectionId, recordId, onDone }: { collectionId?: 
           <label className="field-label" htmlFor="paste-title">
             제목 <span className="font-normal text-faint">(선택)</span>
           </label>
-          <input id="paste-title" className="field" value={title} onChange={(e) => setTitle(e.target.value)} />
+          <input
+            id="paste-title"
+            className="field"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
         </div>
       )}
       <div>
@@ -150,7 +173,9 @@ export function PastePanel({ collectionId, recordId, onDone }: { collectionId?: 
           className="field min-h-56 resize-y leading-relaxed"
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder={"YouTube의 ‘스크립트 표시’에서 복사한 내용을 그대로 붙여넣으면\n시간 정보까지 함께 인식합니다.\n\n0:00\n오늘 함께 나눌 말씀은…"}
+          placeholder={
+            "YouTube의 ‘스크립트 표시’에서 복사한 내용을 그대로 붙여넣으면\n시간 정보까지 함께 인식합니다.\n\n0:00\n오늘 함께 나눌 말씀은…"
+          }
         />
       </div>
       {error && <Notice tone="danger">{error}</Notice>}

@@ -26,7 +26,8 @@ export async function GET(req: Request) {
   const id = params.get("id");
   const lang = (params.get("lang") ?? "ko").slice(0, 8);
   if (!isValidVideoId(id)) return NextResponse.json({ error: "invalid_id" }, { status: 400 });
-  if (!rateLimit(`cap:${clientKey(req)}`, 10)) return NextResponse.json({ error: "rate_limited" }, { status: 429 });
+  if (!rateLimit(`cap:${clientKey(req)}`, 10))
+    return NextResponse.json({ error: "rate_limited" }, { status: 429 });
 
   let player: Response;
   try {

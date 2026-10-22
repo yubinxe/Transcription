@@ -83,7 +83,9 @@ export async function runJob(
   try {
     if (input.kind === "media_file" && opts.keepMedia) {
       await saveMedia(recordId, input.file, input.file.name).catch(() => {
-        set(recordId, { warnings: ["저장 공간이 부족해 원본 파일은 보관하지 못했습니다. 전사는 계속됩니다."] });
+        set(recordId, {
+          warnings: ["저장 공간이 부족해 원본 파일은 보관하지 못했습니다. 전사는 계속됩니다."],
+        });
       });
     }
     const result = await provider.transcribe(input, {
@@ -110,7 +112,10 @@ export async function runJob(
       e instanceof TranscriptionError
         ? e
         : e instanceof DOMException && e.name === "QuotaExceededError"
-          ? new TranscriptionError("quota_exceeded", "브라우저 저장 공간이 부족합니다. 설정에서 사용량을 확인해 주세요.")
+          ? new TranscriptionError(
+              "quota_exceeded",
+              "브라우저 저장 공간이 부족합니다. 설정에서 사용량을 확인해 주세요.",
+            )
           : new TranscriptionError("unknown", e instanceof Error ? e.message : "알 수 없는 오류");
     const partial = (err as TranscriptionError & { partial?: TranscriptSegment[] }).partial;
     set(recordId, {

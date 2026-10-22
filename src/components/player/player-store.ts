@@ -42,7 +42,8 @@ export class PlayerStore {
         const playing = a.isPlaying();
         const lp = this.snap.loop;
         if (lp && playing && timeMs >= lp.endMs) a.seekTo(lp.startMs, true);
-        if (Math.abs(timeMs - this.snap.timeMs) > 120 || playing !== this.snap.playing) this.set({ timeMs, playing });
+        if (Math.abs(timeMs - this.snap.timeMs) > 120 || playing !== this.snap.playing)
+          this.set({ timeMs, playing });
       }
       this.raf = requestAnimationFrame(tick);
     };
@@ -71,7 +72,9 @@ export class PlayerStore {
 
   subscribe = (l: () => void) => {
     this.listeners.add(l);
-    return () => this.listeners.delete(l);
+    return () => {
+      this.listeners.delete(l);
+    };
   };
   getSnapshot = () => this.snap;
   dispose() {

@@ -57,21 +57,25 @@ export async function listRecords(): Promise<ArchiveRecord[]> {
 
 export async function deleteRecord(id: string) {
   const db = getDb();
-  await db.transaction("rw", [db.records, db.transcripts, db.highlights, db.reflections, db.media, db.collections], async () => {
-    await db.records.delete(id);
-    await db.transcripts.delete(id);
-    await db.highlights.where("recordId").equals(id).delete();
-    await db.reflections.delete(id);
-    await db.media.delete(id);
-    // Remove membership and clear any day slot that pointed at the record.
-    for (const c of await db.collections.toArray()) {
-      if (!c.recordIds.includes(id) && !c.days?.some((d) => d.recordId === id)) continue;
-      await db.collections.update(c.id, {
-        recordIds: c.recordIds.filter((r) => r !== id),
-        days: c.days?.map((d) => (d.recordId === id ? { ...d, recordId: null } : d)),
-      });
-    }
-  });
+  await db.transaction(
+    "rw",
+    [db.records, db.transcripts, db.highlights, db.reflections, db.media, db.collections],
+    async () => {
+      await db.records.delete(id);
+      await db.transcripts.delete(id);
+      await db.highlights.where("recordId").equals(id).delete();
+      await db.reflections.delete(id);
+      await db.media.delete(id);
+      // Remove membership and clear any day slot that pointed at the record.
+      for (const c of await db.collections.toArray()) {
+        if (!c.recordIds.includes(id) && !c.days?.some((d) => d.recordId === id)) continue;
+        await db.collections.update(c.id, {
+          recordIds: c.recordIds.filter((r) => r !== id),
+          days: c.days?.map((d) => (d.recordId === id ? { ...d, recordId: null } : d)),
+        });
+      }
+    },
+  );
 }
 
 /* ---------- transcripts ---------- */
@@ -134,12 +138,15 @@ export async function restoreOriginal(recordId: string, segmentId?: string) {
   }
   await db.transcripts.update(recordId, {
     edits: {},
-    history: [...doc.history, ...Object.entries(doc.edits).map(([segmentId, before]) => ({
-      segmentId,
-      before,
-      after: doc.original.find((s) => s.id === segmentId)?.text ?? "",
-      at: Date.now(),
-    }))].slice(-500),
+    history: [
+      ...doc.history,
+      ...Object.entries(doc.edits).map(([segmentId, before]) => ({
+        segmentId,
+        before,
+        after: doc.original.find((s) => s.id === segmentId)?.text ?? "",
+        at: Date.now(),
+      })),
+    ].slice(-500),
     updatedAt: Date.now(),
   });
 }
@@ -202,6 +209,25 @@ export async function saveReflection(reflection: Reflection) {
   await getDb().records.update(reflection.recordId, { updatedAt: Date.now() });
 }
 
+/** Merges a partial reflection into the stored one (read-modify-write in one transaction). */
+export async function patchReflection(
+  recordId: string,
+  patch: Partial<Pick<Reflection, "sections" | "study" | "segmentNotes">>,
+) {
+  const db = getDb();
+  await db.transaction("rw", db.reflections, db.records, async () => {
+    const cur = (await db.reflections.get(recordId)) ?? emptyReflection(recordId);
+    await db.reflections.put({
+      ...cur,
+      sections: { ...cur.sections, ...patch.sections },
+      study: { ...cur.study, ...patch.study },
+      segmentNotes: patch.segmentNotes ?? cur.segmentNotes,
+      updatedAt: Date.now(),
+    });
+    await db.records.update(recordId, { updatedAt: Date.now() });
+  });
+}
+
 /* ---------- media ---------- */
 
 export async function saveMedia(recordId: string, file: Blob, name: string) {
@@ -230,5 +256,8 @@ export async function listCollections() {
 export async function addToCollection(collectionId: string, recordId: string) {
   const c = await getDb().collections.get(collectionId);
   if (!c || c.recordIds.includes(recordId)) return;
-  await getDb().collections.update(collectionId, { recordIds: [...c.recordIds, recordId], updatedAt: Date.now() });
+  await getDb().collections.update(collectionId, {
+    recordIds: [...c.recordIds, recordId],
+    updatedAt: Date.now(),
+  });
 }

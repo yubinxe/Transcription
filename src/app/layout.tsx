@@ -21,8 +21,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ko">
       <head>
-        <link rel="preload" href="/fonts/maruburi/MaruBuri-Regular-core.woff2" as="font" type="font/woff2" crossOrigin="" />
-        <link rel="preload" href="/fonts/maruburi/MaruBuri-SemiBold-core.woff2" as="font" type="font/woff2" crossOrigin="" />
+        <link
+          rel="preload"
+          href="/fonts/maruburi/MaruBuri-Regular-core.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin=""
+        />
+        <link
+          rel="preload"
+          href="/fonts/maruburi/MaruBuri-SemiBold-core.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin=""
+        />
         {/* eslint-disable-next-line @next/next/no-css-tags */}
         <link rel="stylesheet" href="/fonts/pretendard/pretendardvariable-dynamic-subset.css" />
         {/* eslint-disable-next-line @next/next/no-css-tags */}

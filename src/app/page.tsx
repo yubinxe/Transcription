@@ -5,8 +5,16 @@ import { RecentRecords } from "@/components/home/RecentRecords";
 
 const PRINCIPLES = [
   { en: "Listen", ko: "듣다", body: "영상과 음성을 그대로 두고, 들은 말을 시간과 함께 텍스트로 옮깁니다." },
-  { en: "Read", ko: "읽다", body: "문단으로 다시 읽고, 찾고, 고칩니다. 원문은 언제든 되돌릴 수 있게 보존됩니다." },
-  { en: "Reflect", ko: "새기다", body: "붙잡은 문장을 묵상 노트로 옮기고, 오래 남을 나의 문장으로 정리합니다." },
+  {
+    en: "Read",
+    ko: "읽다",
+    body: "문단으로 다시 읽고, 찾고, 고칩니다. 원문은 언제든 되돌릴 수 있게 보존됩니다.",
+  },
+  {
+    en: "Reflect",
+    ko: "새기다",
+    body: "붙잡은 문장을 묵상 노트로 옮기고, 오래 남을 나의 문장으로 정리합니다.",
+  },
 ];
 
 export default function HomePage() {
@@ -38,7 +46,10 @@ export default function HomePage() {
         <section aria-label="새벽기록의 흐름" className="mx-auto max-w-[1320px] px-5 md:px-10">
           <ol className="grid border-t border-ink md:grid-cols-3">
             {PRINCIPLES.map((p, i) => (
-              <li key={p.en} className={`py-9 md:py-10 ${i > 0 ? "border-t hairline md:border-l md:border-t-0 md:pl-10" : ""} md:pr-10`}>
+              <li
+                key={p.en}
+                className={`py-9 md:py-10 ${i > 0 ? "border-t hairline md:border-l md:border-t-0 md:pl-10" : ""} md:pr-10`}
+              >
                 <p className="flex items-baseline gap-3">
                   <span className="numeral text-[0.8125rem] text-gold-deep">{`0${i + 1}`}</span>
                   <span className="eyebrow">{p.en}</span>

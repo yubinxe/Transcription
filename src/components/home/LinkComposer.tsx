@@ -16,10 +16,14 @@ type Phase =
   | { kind: "preview"; parsed: ParsedYouTubeUrl; meta: VideoMeta }
   | { kind: "manual"; parsed: ParsedYouTubeUrl; message: string; fatal: boolean };
 
-export function LinkComposer({ collectionId, onCreated }: { collectionId?: string; onCreated?: (recordId: string) => void } = {}) {
+export function LinkComposer({
+  collectionId,
+  onCreated,
+}: { collectionId?: string; onCreated?: (recordId: string) => void | Promise<void> } = {}) {
   const router = useRouter();
   const [value, setValue] = useState("");
-  const [phase, setPhase] = useState<Phase>({ kind: "idle" });
+  const [rawPhase, setPhase] = useState<Phase>({ kind: "idle" });
+  const phase: Phase = value.trim() || rawPhase.kind === "invalid" ? rawPhase : { kind: "idle" };
   const [manualTitle, setManualTitle] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
@@ -29,7 +33,11 @@ export function LinkComposer({ collectionId, onCreated }: { collectionId?: strin
     const parsed = parseYouTubeUrl(raw);
     if (!parsed.ok) {
       lastIdRef.current = null;
-      setPhase(parsed.reason === "empty" ? { kind: "idle" } : { kind: "invalid", message: PARSE_FAILURE_MESSAGE[parsed.reason] });
+      setPhase(
+        parsed.reason === "empty"
+          ? { kind: "idle" }
+          : { kind: "invalid", message: PARSE_FAILURE_MESSAGE[parsed.reason] },
+      );
       return null;
     }
     if (lastIdRef.current === parsed.value.videoId) return parsed.value;
@@ -58,7 +66,6 @@ export function LinkComposer({ collectionId, onCreated }: { collectionId?: strin
   // Paste is auto-detected: no need to press anything.
   useEffect(() => {
     if (!value.trim()) {
-      setPhase({ kind: "idle" });
       lastIdRef.current = null;
       return;
     }
@@ -70,6 +77,7 @@ export function LinkComposer({ collectionId, onCreated }: { collectionId?: strin
     if (submitting) return;
     const parsed = parseYouTubeUrl(value);
     if (!parsed.ok) {
+      if (!value.trim()) document.getElementById("yt-url")?.focus();
       setPhase({ kind: "invalid", message: PARSE_FAILURE_MESSAGE[parsed.reason] });
       return;
     }
@@ -78,11 +86,12 @@ export function LinkComposer({ collectionId, onCreated }: { collectionId?: strin
       const existing = await findRecordByVideoId(parsed.value.videoId);
       if (existing) {
         if (collectionId) await addToCollection(collectionId, existing.id);
-        onCreated?.(existing.id);
+        await onCreated?.(existing.id);
         router.push(`/record/${existing.id}`);
         return;
       }
-      const meta = phase.kind === "preview" && phase.parsed.videoId === parsed.value.videoId ? phase.meta : null;
+      const meta =
+        phase.kind === "preview" && phase.parsed.videoId === parsed.value.videoId ? phase.meta : null;
       const record = await createRecord({
         title: meta?.title ?? manualTitle.trim() ?? "",
         source: {
@@ -95,7 +104,7 @@ export function LinkComposer({ collectionId, onCreated }: { collectionId?: strin
         },
       });
       if (collectionId) await addToCollection(collectionId, record.id);
-      onCreated?.(record.id);
+      await onCreated?.(record.id);
       router.push(`/record/${record.id}?start=1`);
     } finally {
       setSubmitting(false);
@@ -115,7 +124,9 @@ export function LinkComposer({ collectionId, onCreated }: { collectionId?: strin
         }}
         className={cn(
           "group flex flex-col border bg-surface transition-[border-color,box-shadow] duration-200 sm:flex-row sm:items-stretch",
-          invalid ? "border-danger/60" : "border-rule focus-within:border-ink hover:border-faint focus-within:hover:border-ink",
+          invalid
+            ? "border-danger/60"
+            : "border-rule focus-within:border-ink hover:border-faint focus-within:hover:border-ink",
           "focus-within:shadow-[0_18px_40px_-28px_rgba(37,41,36,0.45)]",
         )}
       >
@@ -139,12 +150,15 @@ export function LinkComposer({ collectionId, onCreated }: { collectionId?: strin
         />
         <button
           type="submit"
-          disabled={submitting || invalid || blocked || !value.trim() || phase.kind === "checking"}
+          disabled={submitting || blocked}
           className="btn btn-primary m-1.5 min-h-[3.25rem] px-6 text-[0.9375rem] sm:m-2 sm:min-h-0 sm:px-7"
         >
           {submitting ? <Loader2 className="size-4 animate-spin" aria-hidden /> : null}
           기록 시작하기
-          <ArrowRight className="size-4 transition-transform duration-200 group-focus-within:translate-x-0.5" aria-hidden />
+          <ArrowRight
+            className="size-4 transition-transform duration-200 group-focus-within:translate-x-0.5"
+            aria-hidden
+          />
         </button>
       </form>
 
@@ -159,18 +173,29 @@ export function LinkComposer({ collectionId, onCreated }: { collectionId?: strin
         {phase.kind === "preview" && (
           <div className="fade-in mt-5 flex items-center gap-4 border-t hairline pt-5">
             <div className="relative aspect-video w-28 shrink-0 overflow-hidden bg-border sm:w-36">
-              <Image src={phase.meta.thumbnailUrl} alt="" fill sizes="144px" className="object-cover" unoptimized />
+              <Image
+                src={phase.meta.thumbnailUrl}
+                alt=""
+                fill
+                sizes="144px"
+                className="object-cover"
+                unoptimized
+              />
             </div>
             <div className="min-w-0">
               <p className="eyebrow mb-1.5">{phase.parsed.isShorts ? "Shorts" : "YouTube"}</p>
               <p className="serif line-clamp-2 text-[1.0625rem] leading-snug text-ink">{phase.meta.title}</p>
-              {phase.meta.channel && <p className="mt-1 truncate text-[0.8125rem] text-muted">{phase.meta.channel}</p>}
+              {phase.meta.channel && (
+                <p className="mt-1 truncate text-[0.8125rem] text-muted">{phase.meta.channel}</p>
+              )}
             </div>
           </div>
         )}
         {phase.kind === "manual" && (
           <div className="fade-in mt-5 border-t hairline pt-5">
-            <p className={cn("text-[0.875rem]", phase.fatal ? "text-danger" : "text-ink-soft")}>{phase.message}</p>
+            <p className={cn("text-[0.875rem]", phase.fatal ? "text-danger" : "text-ink-soft")}>
+              {phase.message}
+            </p>
             {needsTitle && (
               <div className="mt-3 max-w-md">
                 <label htmlFor="manual-title" className="field-label">

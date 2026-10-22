@@ -34,7 +34,8 @@ export function createRemoteWhisperProvider(endpoint: string, language: string):
     label: "연결된 faster-whisper 서버",
     canHandle: (input) => input.kind === "media_file",
     async transcribe(input: TranscriptInput, options: TranscriptionOptions = {}): Promise<TranscriptResult> {
-      if (input.kind !== "media_file") throw new TranscriptionError("invalid_input", "음성 파일이 필요합니다.");
+      if (input.kind !== "media_file")
+        throw new TranscriptionError("invalid_input", "음성 파일이 필요합니다.");
       const base = validateEndpoint(endpoint);
       if (!base) throw new TranscriptionError("invalid_input", "전사 서버 주소가 올바르지 않습니다.");
       options.onStage?.("recognizing");
@@ -43,14 +44,23 @@ export function createRemoteWhisperProvider(endpoint: string, language: string):
       form.append("language", language);
       let res: Response;
       try {
-        res = await fetch(new URL("/transcribe", base), { method: "POST", body: form, signal: options.signal });
+        res = await fetch(new URL("/transcribe", base), {
+          method: "POST",
+          body: form,
+          signal: options.signal,
+        });
       } catch (e) {
-        if ((e as Error).name === "AbortError") throw new TranscriptionError("aborted", "작업을 취소했습니다.");
-        throw new TranscriptionError("network", "전사 서버에 연결하지 못했습니다. 서버가 실행 중인지 확인해 주세요.");
+        if ((e as Error).name === "AbortError")
+          throw new TranscriptionError("aborted", "작업을 취소했습니다.");
+        throw new TranscriptionError(
+          "network",
+          "전사 서버에 연결하지 못했습니다. 서버가 실행 중인지 확인해 주세요.",
+        );
       }
       if (!res.ok) throw new TranscriptionError("unknown", `전사 서버 오류 (${res.status})`);
       const parsed = ResponseSchema.safeParse(await res.json());
-      if (!parsed.success) throw new TranscriptionError("unknown", "전사 서버 응답 형식이 올바르지 않습니다.");
+      if (!parsed.success)
+        throw new TranscriptionError("unknown", "전사 서버 응답 형식이 올바르지 않습니다.");
       options.onStage?.("finalizing");
       return {
         method: "remote_whisper",

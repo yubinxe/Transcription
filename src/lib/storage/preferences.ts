@@ -13,7 +13,14 @@ const PrefsSchema = z.object({
       mode: z.enum(["paragraph", "segment"]).default("paragraph"),
       autoScroll: z.boolean().default(true),
     })
-    .default({ fontSize: 18, lineHeight: 1.8, measure: "standard", showTimestamps: true, mode: "paragraph", autoScroll: true }),
+    .default({
+      fontSize: 18,
+      lineHeight: 1.8,
+      measure: "standard",
+      showTimestamps: true,
+      mode: "paragraph",
+      autoScroll: true,
+    }),
   asr: z
     .object({
       backend: z.enum(["browser", "remote"]).default("browser"),
@@ -22,7 +29,13 @@ const PrefsSchema = z.object({
       remoteEndpoint: z.string().default("http://127.0.0.1:8765"),
       language: z.string().default("korean"),
     })
-    .default({ backend: "browser", modelId: "auto", device: "auto", remoteEndpoint: "http://127.0.0.1:8765", language: "korean" }),
+    .default({
+      backend: "browser",
+      modelId: "auto",
+      device: "auto",
+      remoteEndpoint: "http://127.0.0.1:8765",
+      language: "korean",
+    }),
   experimentalCaptions: z.boolean().default(false),
   keepMedia: z.boolean().default(true),
 });

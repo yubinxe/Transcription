@@ -85,7 +85,12 @@ export function normalizeCues(cues: RawCue[], source: SegmentSource, idPrefix = 
       continue;
     }
     prevLines = text.split("\n");
-    out.push({ startMs: cue.startMs, endMs: cue.endMs, text: lines.join(" "), paragraphStart: cue.paragraphStart });
+    out.push({
+      startMs: cue.startMs,
+      endMs: cue.endMs,
+      text: lines.join(" "),
+      paragraphStart: cue.paragraphStart,
+    });
   }
 
   for (let i = 0; i < out.length; i++) {
@@ -97,7 +102,12 @@ export function normalizeCues(cues: RawCue[], source: SegmentSource, idPrefix = 
       c.endMs = next.startMs;
     }
     // Overlap: trim the end so the active-segment lookup stays unambiguous. Text is untouched.
-    if (c.endMs != null && next?.startMs != null && c.endMs > next.startMs && next.startMs >= (c.startMs ?? 0)) {
+    if (
+      c.endMs != null &&
+      next?.startMs != null &&
+      c.endMs > next.startMs &&
+      next.startMs >= (c.startMs ?? 0)
+    ) {
       c.endMs = next.startMs;
     }
   }

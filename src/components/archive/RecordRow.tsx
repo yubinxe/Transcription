@@ -60,7 +60,15 @@ export function RecordRow({ record, compact = false }: { record: ArchiveRecord; 
         )}
       </div>
       <div className="col-start-2 flex items-center gap-3 text-[0.75rem] text-muted sm:col-start-3 sm:flex-col sm:items-end sm:gap-1.5">
-        <span className={record.status === "ready" ? "text-forest" : record.status === "transcribing" ? "text-gold-deep" : ""}>
+        <span
+          className={
+            record.status === "ready"
+              ? "text-forest"
+              : record.status === "transcribing"
+                ? "text-gold-deep"
+                : ""
+          }
+        >
           {STATUS_LABEL[record.status]}
         </span>
         <span className="tabular">{formatDateTime(record.updatedAt)}</span>

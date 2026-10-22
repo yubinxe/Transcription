@@ -22,9 +22,16 @@ export function Toaster() {
     };
   }, []);
   return (
-    <div aria-live="polite" role="status" className="pointer-events-none fixed inset-x-0 bottom-6 z-50 flex flex-col items-center gap-2 px-4">
+    <div
+      aria-live="polite"
+      role="status"
+      className="pointer-events-none fixed inset-x-0 bottom-6 z-50 flex flex-col items-center gap-2 px-4"
+    >
       {items.map((t) => (
-        <div key={t.id} className="fade-in rounded-[2px] bg-ink px-4 py-2.5 text-[0.8125rem] text-canvas shadow-[0_8px_24px_-12px_rgba(0,0,0,0.4)]">
+        <div
+          key={t.id}
+          className="fade-in rounded-[2px] bg-ink px-4 py-2.5 text-[0.8125rem] text-canvas shadow-[0_8px_24px_-12px_rgba(0,0,0,0.4)]"
+        >
           {t.message}
         </div>
       ))}
