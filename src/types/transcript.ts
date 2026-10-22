@@ -48,7 +48,7 @@ export type TranscriptionStage =
 
 export type TranscriptMethod =
   | "youtube_oauth"
-  | "youtube_unofficial"
+  | "youtube_captions"
   | "uploaded_caption"
   | "pasted_transcript"
   | "local_whisper"

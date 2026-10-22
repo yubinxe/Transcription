@@ -30,7 +30,7 @@ worker/                     optional Python faster-whisper server (local / separ
 | On-device Whisper (Transformers.js) | user-provided audio/video | ⚠️ pipeline verified up to model download; actual Korean recognition **not verified in CI sandbox** (Hugging Face blocked) |
 | faster-whisper server | user-provided audio/video | ⚠️ code provided, not executed here |
 | YouTube Data API (OAuth) | videos the user owns/manages | ⚠️ requires `NEXT_PUBLIC_GOOGLE_CLIENT_ID`; not executed here |
-| Public caption track (experimental) | public videos with captions | ⚠️ off by default; YouTube unreachable from sandbox |
+| Link → text (public caption track, landing page) | public videos with a transcript | ⚠️ needs `DAWN_UNOFFICIAL_CAPTIONS=enabled`; YouTube unreachable from sandbox, so not verified live. Cloud IPs can be bot-checked by YouTube → paste fallback |
 
 ## Data model (IndexedDB `dawn-archive`)
 `records` · `transcripts` (immutable `original` + `edits` + `history` + `raw` file) · `highlights` · `reflections` · `collections` (`days[]`, `recordIds[]`, many-to-many) · `media` (uploaded blobs, optional).

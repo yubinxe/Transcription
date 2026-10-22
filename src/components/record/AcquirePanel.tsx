@@ -12,7 +12,7 @@ import {
   type JobState,
 } from "@/features/transcription/jobs";
 import { youtubeOAuthProvider, GOOGLE_CLIENT_ID } from "@/features/transcription/providers/youtube-oauth";
-import { youtubeUnofficialProvider } from "@/features/transcription/providers/youtube-unofficial";
+import { youtubeCaptionsProvider } from "@/features/transcription/providers/youtube-captions";
 import { importText, readTextFile, startMediaTranscription } from "@/features/transcription/start";
 import { usePreferences } from "@/lib/storage/preferences";
 import { formatBytes } from "@/lib/storage/backup";
@@ -43,7 +43,7 @@ export function AcquirePanel({ record, autoStart }: { record: ArchiveRecord; aut
     if (!isYouTube) return;
     fetch("/api/health")
       .then((r) => r.json())
-      .then((d: { unofficialCaptions?: boolean }) => setServerCaptions(!!d.unofficialCaptions))
+      .then((d: { captions?: boolean }) => setServerCaptions(!!d.captions))
       .catch(() => setServerCaptions(false));
   }, [isYouTube]);
 
@@ -53,7 +53,7 @@ export function AcquirePanel({ record, autoStart }: { record: ArchiveRecord; aut
   useEffect(() => {
     if (!autoStart || started.current || !experimental || job) return;
     started.current = true;
-    void runJob(record.id, youtubeUnofficialProvider, {
+    void runJob(record.id, youtubeCaptionsProvider, {
       kind: "youtube",
       videoId: record.source.videoId!,
       url: record.source.url!,
@@ -198,7 +198,7 @@ export function AcquirePanel({ record, autoStart }: { record: ArchiveRecord; aut
                 type="button"
                 className="btn btn-quiet btn-sm"
                 onClick={() =>
-                  void runJob(record.id, youtubeUnofficialProvider, {
+                  void runJob(record.id, youtubeCaptionsProvider, {
                     kind: "youtube",
                     videoId: record.source.videoId!,
                     url: record.source.url!,

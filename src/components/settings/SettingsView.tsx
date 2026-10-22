@@ -34,7 +34,7 @@ export function SettingsView() {
     void estimateStorage().then(setStorage);
     fetch("/api/health")
       .then((r) => r.json())
-      .then((d: { unofficialCaptions?: boolean }) => setServerCaptions(!!d.unofficialCaptions))
+      .then((d: { captions?: boolean }) => setServerCaptions(!!d.captions))
       .catch(() => setServerCaptions(false));
   }, []);
 

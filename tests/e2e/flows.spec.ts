@@ -14,50 +14,46 @@ async function noHorizontalScroll(page: Page) {
 
 test("home explains itself and validates links", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("들은 말씀을");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("링크를 붙여넣으면");
   const input = page.getByLabel("YouTube 영상 링크");
+  const go = page.getByRole("button", { name: "텍스트로 보기" });
   await input.fill("https://vimeo.com/123");
+  await go.click();
   await expect(page.getByText("YouTube 링크만 지원합니다.")).toBeVisible();
   await input.fill("https://www.youtube.com/playlist?list=PL1");
+  await go.click();
   await expect(page.getByText(/재생목록 링크입니다/)).toBeVisible();
   await noHorizontalScroll(page);
 });
 
-test("YouTube link → record → paste transcript → synced reader", async ({ page }) => {
+test("YouTube link → text on the landing → save → synced reader", async ({ page }) => {
   await page.goto("/");
   await page.getByLabel("YouTube 영상 링크").fill("https://youtu.be/dQw4w9WgXcQ?si=tracking");
-  // Metadata may be unreachable (sandboxed CI); either preview or manual title is acceptable.
-  await expect(page.getByText(/영상 정보를 확인하지 못했습니다|YouTube$/).first()).toBeVisible({
-    timeout: 15_000,
-  });
-  const manual = page.getByLabel("기록 제목");
-  if (await manual.isVisible()) await manual.fill("10월 22일 새벽 말씀");
-  await page.getByRole("button", { name: /기록 시작하기/ }).click();
-  await expect(page).toHaveURL(/\/record\/r_/);
-  await expect(page.getByText("이 영상의 말씀을 텍스트로 옮겨 볼까요")).toBeVisible();
-
-  await page.getByRole("button", { name: /YouTube 스크립트 붙여넣기/ }).click();
-  await page
-    .getByLabel("텍스트")
-    .fill(
+  await page.getByRole("button", { name: "텍스트로 보기" }).click();
+  // Automatic retrieval is off on the test server (and YouTube is unreachable), so the paste path appears.
+  const paste = page.getByLabel("스크립트 붙여넣기");
+  const article = page.locator("article.reading");
+  await expect(paste.or(article)).toBeVisible({ timeout: 20_000 });
+  if (await paste.isVisible()) {
+    await paste.fill(
       "0:00\n0초\n할렐루야 반갑습니다\n0:05\n5초\n오늘 함께 읽을 말씀은 요한복음입니다\n0:12\n12초\n말씀 앞에 머무릅시다",
     );
-  await page.getByRole("button", { name: "가져오기", exact: true }).click();
-  await expect(page.getByRole("tab", { name: "원문" })).toBeVisible();
-  await expect(page.getByText("오늘 함께 읽을 말씀은 요한복음입니다")).toBeVisible();
-  await expect(
-    page
-      .getByRole("button", { name: "00:05 지점부터 재생" })
-      .or(page.getByRole("button", { name: "00:00 지점부터 재생" }))
-      .first(),
-  ).toBeVisible();
+    await page.getByRole("button", { name: "텍스트로 보기" }).last().click();
+  }
+  await expect(article.getByText(/오늘 함께 읽을 말씀은 요한복음입니다/)).toBeVisible();
+  await expect(page.getByText(/3문장/)).toBeVisible();
   await noHorizontalScroll(page);
 
-  // Same video again → the existing record opens, no duplicate.
+  await page.getByRole("button", { name: /저장하고 묵상하기/ }).click();
+  await expect(page).toHaveURL(/\/record\/r_/);
+  await expect(page.getByText("오늘 함께 읽을 말씀은 요한복음입니다")).toBeVisible();
+  await expect(page.getByRole("button", { name: "00:00 지점부터 재생" })).toBeVisible();
+
+  // Same link again → served from the archive instantly, no duplicate record.
   await page.goto("/");
   await page.getByLabel("YouTube 영상 링크").fill("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
-  await page.getByRole("button", { name: /기록 시작하기/ }).click();
-  await expect(page.getByText("오늘 함께 읽을 말씀은 요한복음입니다")).toBeVisible();
+  await page.getByRole("button", { name: "텍스트로 보기" }).click();
+  await expect(article.getByText(/요한복음입니다/)).toBeVisible();
   await page.goto("/archive");
   await expect(page.locator("main li")).toHaveCount(1);
 });

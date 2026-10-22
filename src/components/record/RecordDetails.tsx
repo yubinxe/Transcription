@@ -8,7 +8,7 @@ import { toast } from "@/components/ui/Toaster";
 
 export const METHOD_LABEL: Record<string, string> = {
   youtube_oauth: "YouTube 자막 (공식 API)",
-  youtube_unofficial: "YouTube 공개 자막 (실험적)",
+  youtube_captions: "YouTube 자막",
   uploaded_caption: "자막 파일",
   pasted_transcript: "YouTube 스크립트 붙여넣기",
   local_whisper: "기기 내 음성 인식 (Whisper)",
