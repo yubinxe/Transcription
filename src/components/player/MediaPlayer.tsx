@@ -10,6 +10,8 @@ export function MediaPlayer({ blob, type, store }: { blob: Blob; type: string; s
 
   useEffect(() => {
     const u = URL.createObjectURL(blob);
+    // Object URLs are an external resource: create and revoke with the effect lifecycle.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setUrl(u);
     return () => URL.revokeObjectURL(u);
   }, [blob]);
@@ -32,7 +34,13 @@ export function MediaPlayer({ blob, type, store }: { blob: Blob; type: string; s
 
   if (!url) return null;
   return isVideo ? (
-    <video ref={(n) => void (ref.current = n)} src={url} controls playsInline className="aspect-video w-full bg-[#1d201c]" />
+    <video
+      ref={(n) => void (ref.current = n)}
+      src={url}
+      controls
+      playsInline
+      className="aspect-video w-full bg-[#1d201c]"
+    />
   ) : (
     <div className="border hairline bg-surface p-4">
       <audio ref={(n) => void (ref.current = n)} src={url} controls className="w-full" />

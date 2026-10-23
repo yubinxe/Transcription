@@ -13,7 +13,10 @@ export function validateMediaFile(file: File) {
     );
   }
   if (file.size > MAX_MEDIA_BYTES) {
-    throw new TranscriptionError("file_too_large", "1GB를 넘는 파일은 브라우저에서 처리할 수 없습니다. 음성만 추출해 다시 시도해 주세요.");
+    throw new TranscriptionError(
+      "file_too_large",
+      "1GB를 넘는 파일은 브라우저에서 처리할 수 없습니다. 음성만 추출해 다시 시도해 주세요.",
+    );
   }
 }
 
@@ -24,7 +27,8 @@ export async function decodeToMono16k(file: Blob): Promise<Float32Array> {
     typeof AudioContext !== "undefined"
       ? AudioContext
       : (globalThis as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-  if (!Ctx) throw new TranscriptionError("unsupported_file", "이 브라우저는 오디오 디코딩을 지원하지 않습니다.");
+  if (!Ctx)
+    throw new TranscriptionError("unsupported_file", "이 브라우저는 오디오 디코딩을 지원하지 않습니다.");
   let ctx: AudioContext;
   try {
     ctx = new Ctx({ sampleRate: ASR_SAMPLE_RATE });
@@ -34,12 +38,20 @@ export async function decodeToMono16k(file: Blob): Promise<Float32Array> {
   try {
     const audio = await ctx.decodeAudioData(buf);
     const mono = mixToMono(audio);
-    return audio.sampleRate === ASR_SAMPLE_RATE ? mono : resampleLinear(mono, audio.sampleRate, ASR_SAMPLE_RATE);
+    return audio.sampleRate === ASR_SAMPLE_RATE
+      ? mono
+      : resampleLinear(mono, audio.sampleRate, ASR_SAMPLE_RATE);
   } catch (e) {
     if (e instanceof RangeError) {
-      throw new TranscriptionError("out_of_memory", "파일이 너무 길어 기기 메모리에서 디코딩하지 못했습니다. 파일을 나눠 업로드해 주세요.");
+      throw new TranscriptionError(
+        "out_of_memory",
+        "파일이 너무 길어 기기 메모리에서 디코딩하지 못했습니다. 파일을 나눠 업로드해 주세요.",
+      );
     }
-    throw new TranscriptionError("unsupported_file", "오디오 트랙을 읽지 못했습니다. 다른 형식(mp3, m4a, wav)으로 시도해 주세요.");
+    throw new TranscriptionError(
+      "unsupported_file",
+      "오디오 트랙을 읽지 못했습니다. 다른 형식(mp3, m4a, wav)으로 시도해 주세요.",
+    );
   } finally {
     void ctx.close();
   }

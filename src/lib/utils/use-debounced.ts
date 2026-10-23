@@ -15,8 +15,10 @@ export function useAutosave<T>(value: T, ms: number, save: (v: T) => void | Prom
   const latest = useRef(value);
   const saved = useRef(value);
   const saveRef = useRef(save);
-  saveRef.current = save;
-  latest.current = value;
+  useEffect(() => {
+    saveRef.current = save;
+    latest.current = value;
+  });
   useEffect(() => {
     if (!enabled || Object.is(value, saved.current)) return;
     const t = setTimeout(() => {

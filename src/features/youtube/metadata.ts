@@ -25,7 +25,8 @@ export async function fetchVideoMeta(videoId: string, signal?: AbortSignal): Pro
 }
 
 export const META_FAILURE_MESSAGE: Record<Exclude<MetaResult, { ok: true }>["reason"], string> = {
-  restricted: "비공개이거나 외부 재생이 제한된 영상일 수 있습니다. 제목을 직접 입력해 기록을 이어갈 수 있습니다.",
+  restricted:
+    "비공개이거나 외부 재생이 제한된 영상일 수 있습니다. 제목을 직접 입력해 기록을 이어갈 수 있습니다.",
   not_found: "영상을 찾지 못했습니다. 삭제되었거나 주소가 잘못되었을 수 있습니다.",
   network: "영상 정보를 확인하지 못했습니다. 제목을 직접 입력해 계속할 수 있습니다.",
   rate_limited: "요청이 많습니다. 잠시 후 다시 시도해 주세요.",

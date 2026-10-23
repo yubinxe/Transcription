@@ -11,7 +11,8 @@ export const runtime = "nodejs";
 export async function GET(req: Request) {
   const id = new URL(req.url).searchParams.get("id");
   if (!isValidVideoId(id)) return NextResponse.json({ error: "invalid_id" }, { status: 400 });
-  if (!rateLimit(`meta:${clientKey(req)}`, 60)) return NextResponse.json({ error: "rate_limited" }, { status: 429 });
+  if (!rateLimit(`meta:${clientKey(req)}`, 60))
+    return NextResponse.json({ error: "rate_limited" }, { status: 429 });
 
   const target = `https://www.youtube.com/oembed?format=json&url=${encodeURIComponent(`https://www.youtube.com/watch?v=${id}`)}`;
   let res: Response;
@@ -24,7 +25,8 @@ export async function GET(req: Request) {
     // oEmbed answers 401 for videos whose owner disabled embedding, and for private videos.
     return NextResponse.json({ error: "restricted" }, { status: 403 });
   }
-  if (res.status === 404 || res.status === 400) return NextResponse.json({ error: "not_found" }, { status: 404 });
+  if (res.status === 404 || res.status === 400)
+    return NextResponse.json({ error: "not_found" }, { status: 404 });
   if (!res.ok) return NextResponse.json({ error: "upstream" }, { status: 502 });
 
   const data = (await res.json().catch(() => null)) as {

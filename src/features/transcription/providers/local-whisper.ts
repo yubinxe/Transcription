@@ -26,7 +26,8 @@ export function createLocalWhisperProvider(config: LocalWhisperConfig): Transcri
     label: "이 기기에서 음성 인식",
     canHandle: (input) => input.kind === "media_file",
     async transcribe(input: TranscriptInput, options: TranscriptionOptions = {}): Promise<TranscriptResult> {
-      if (input.kind !== "media_file") throw new TranscriptionError("invalid_input", "음성 파일이 필요합니다.");
+      if (input.kind !== "media_file")
+        throw new TranscriptionError("invalid_input", "음성 파일이 필요합니다.");
       validateMediaFile(input.file);
       const { signal, onStage, onPartial } = options;
       if (signal?.aborted) throw new TranscriptionError("aborted", "작업을 취소했습니다.");
@@ -36,7 +37,9 @@ export function createLocalWhisperProvider(config: LocalWhisperConfig): Transcri
       if (signal?.aborted) throw new TranscriptionError("aborted", "작업을 취소했습니다.");
       const durationMs = Math.round((audio.length / ASR_SAMPLE_RATE) * 1000);
 
-      const worker = new Worker(new URL("../../../workers/whisper.worker.ts", import.meta.url), { type: "module" });
+      const worker = new Worker(new URL("../../../workers/whisper.worker.ts", import.meta.url), {
+        type: "module",
+      });
       const segments: TranscriptSegment[] = [];
 
       return new Promise<TranscriptResult>((resolve, reject) => {
@@ -54,7 +57,14 @@ export function createLocalWhisperProvider(config: LocalWhisperConfig): Transcri
         signal?.addEventListener("abort", onAbort, { once: true });
 
         worker.onerror = (e) =>
-          finish(() => reject(new TranscriptionError("model_load_failed", `음성 인식 엔진을 시작하지 못했습니다. ${e.message ?? ""}`.trim())));
+          finish(() =>
+            reject(
+              new TranscriptionError(
+                "model_load_failed",
+                `음성 인식 엔진을 시작하지 못했습니다. ${e.message ?? ""}`.trim(),
+              ),
+            ),
+          );
 
         worker.onmessage = (e: MessageEvent<WorkerResponse>) => {
           const msg = e.data;
@@ -97,7 +107,8 @@ export function createLocalWhisperProvider(config: LocalWhisperConfig): Transcri
                   method: "local_whisper",
                   language: config.language,
                   durationMs,
-                  warnings: segments.length === 0 ? ["인식된 음성이 없습니다. 음량이나 파일을 확인해 주세요."] : [],
+                  warnings:
+                    segments.length === 0 ? ["인식된 음성이 없습니다. 음량이나 파일을 확인해 주세요."] : [],
                 });
               });
               break;

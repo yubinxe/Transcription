@@ -61,7 +61,10 @@ export function toSrt(segments: TranscriptSegment[]): string {
   if (!hasTimestamps(segments)) throw new Error("SRT는 타임스탬프가 있는 전사문에서만 만들 수 있습니다.");
   return (
     segments
-      .map((s, i) => `${i + 1}\n${formatSrtTime(s.startMs!)} --> ${formatSrtTime(cueEnd(segments, i))}\n${s.text}`)
+      .map(
+        (s, i) =>
+          `${i + 1}\n${formatSrtTime(s.startMs!)} --> ${formatSrtTime(cueEnd(segments, i))}\n${s.text}`,
+      )
       .join("\n\n") + "\n"
   );
 }
@@ -176,7 +179,12 @@ export function toMarkdown(bundle: ExportBundle, scope: ExportScope): string {
     }
   }
 
-  return out.join("\n").replace(/\n{3,}/g, "\n\n").trimEnd() + "\n";
+  return (
+    out
+      .join("\n")
+      .replace(/\n{3,}/g, "\n\n")
+      .trimEnd() + "\n"
+  );
 }
 
 export function toTxt(bundle: ExportBundle, scope: ExportScope, withTimestamps = true): string {
@@ -192,8 +200,10 @@ export function toTxt(bundle: ExportBundle, scope: ExportScope, withTimestamps =
 export function toJson(bundle: ExportBundle, scope: ExportScope): string {
   const payload: Record<string, unknown> = { app: "dawn-archive", version: 1, record: bundle.record };
   if (scope === "original" || scope === "combined") payload.segments = applyEdits(bundle.transcript, false);
-  if (scope === "edited" || scope === "combined") payload.editedSegments = applyEdits(bundle.transcript, true);
-  if (scope === "highlights" || scope === "combined" || scope === "reflection") payload.highlights = bundle.highlights;
+  if (scope === "edited" || scope === "combined")
+    payload.editedSegments = applyEdits(bundle.transcript, true);
+  if (scope === "highlights" || scope === "combined" || scope === "reflection")
+    payload.highlights = bundle.highlights;
   if (scope === "reflection" || scope === "combined") payload.reflection = bundle.reflection;
   return JSON.stringify(payload, null, 2);
 }

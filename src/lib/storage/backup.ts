@@ -55,27 +55,35 @@ export async function restoreBackup(json: string, mode: "merge" | "replace"): Pr
   if (!result.success) throw new Error("새벽기록 백업 파일이 아니거나 손상된 파일입니다.");
   const data = result.data;
   const db = getDb();
-  await db.transaction("rw", [db.records, db.transcripts, db.highlights, db.reflections, db.collections, db.media], async () => {
-    if (mode === "replace") {
-      await Promise.all([
-        db.records.clear(),
-        db.transcripts.clear(),
-        db.highlights.clear(),
-        db.reflections.clear(),
-        db.collections.clear(),
-        db.media.clear(),
-      ]);
-    }
-    // bulkPut: same id → backup wins (merge keeps unrelated local records).
-    /* eslint-disable @typescript-eslint/no-explicit-any */
-    await db.records.bulkPut(data.records as any);
-    await db.transcripts.bulkPut(data.transcripts as any);
-    await db.highlights.bulkPut(data.highlights as any);
-    await db.reflections.bulkPut(data.reflections as any);
-    await db.collections.bulkPut(data.collections as any);
-    /* eslint-enable @typescript-eslint/no-explicit-any */
-  });
-  return { records: data.records.length, highlights: data.highlights.length, collections: data.collections.length };
+  await db.transaction(
+    "rw",
+    [db.records, db.transcripts, db.highlights, db.reflections, db.collections, db.media],
+    async () => {
+      if (mode === "replace") {
+        await Promise.all([
+          db.records.clear(),
+          db.transcripts.clear(),
+          db.highlights.clear(),
+          db.reflections.clear(),
+          db.collections.clear(),
+          db.media.clear(),
+        ]);
+      }
+      // bulkPut: same id → backup wins (merge keeps unrelated local records).
+      /* eslint-disable @typescript-eslint/no-explicit-any */
+      await db.records.bulkPut(data.records as any);
+      await db.transcripts.bulkPut(data.transcripts as any);
+      await db.highlights.bulkPut(data.highlights as any);
+      await db.reflections.bulkPut(data.reflections as any);
+      await db.collections.bulkPut(data.collections as any);
+      /* eslint-enable @typescript-eslint/no-explicit-any */
+    },
+  );
+  return {
+    records: data.records.length,
+    highlights: data.highlights.length,
+    collections: data.collections.length,
+  };
 }
 
 export interface StorageEstimate {
@@ -85,7 +93,8 @@ export interface StorageEstimate {
 }
 
 export async function estimateStorage(): Promise<StorageEstimate> {
-  if (typeof navigator === "undefined" || !navigator.storage) return { usage: null, quota: null, persisted: null };
+  if (typeof navigator === "undefined" || !navigator.storage)
+    return { usage: null, quota: null, persisted: null };
   const [est, persisted] = await Promise.all([
     navigator.storage.estimate?.().catch(() => null),
     navigator.storage.persisted?.().catch(() => null),

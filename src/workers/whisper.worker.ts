@@ -60,7 +60,9 @@ async function transcribe(req: Extract<WorkerRequest, { type: "transcribe" }>) {
       task: "transcribe",
       return_timestamps: true,
     })) as { text: string; chunks?: WindowChunk[] };
-    const chunks: WindowChunk[] = out.chunks?.length ? out.chunks : [{ text: out.text, timestamp: [0, null] }];
+    const chunks: WindowChunk[] = out.chunks?.length
+      ? out.chunks
+      : [{ text: out.text, timestamp: [0, null] }];
     const plan = planWindow(chunks, seek, end, audio.length, SR);
     seek = plan.nextSeekSamples;
     post({

@@ -26,11 +26,17 @@ export function RevivalStrip() {
       <div className="grid gap-8 border-t border-ink pt-10 md:grid-cols-12 md:gap-10">
         <div className="md:col-span-4">
           <p className="eyebrow">Collection · 2026.10.19 — 10.24</p>
-          <h2 id="revival-title" className="serif mt-4 text-[1.625rem] leading-[1.3] tracking-[-0.02em] md:text-[1.875rem]">
+          <h2
+            id="revival-title"
+            className="serif mt-4 text-[1.625rem] leading-[1.3] tracking-[-0.02em] md:text-[1.875rem]"
+          >
             {REVIVAL_2026.title}
           </h2>
           <p className="mt-3 text-[0.9375rem] leading-relaxed text-muted">{REVIVAL_2026.description}</p>
-          <Link href={`/collections/${REVIVAL_2026_ID}`} className="link-quiet mt-6 inline-block text-[0.875rem]">
+          <Link
+            href={`/collections/${REVIVAL_2026_ID}`}
+            className="link-quiet mt-6 inline-block text-[0.875rem]"
+          >
             컬렉션 열기
           </Link>
         </div>
@@ -59,7 +65,12 @@ export function RevivalStrip() {
                     <span className="eyebrow !tracking-[0.18em]">Day</span>
                     {isToday && <span className="text-[0.6875rem] font-medium text-forest">오늘</span>}
                   </span>
-                  <span className={cn("numeral mt-1 text-[2.25rem] leading-none tracking-[-0.03em]", isToday ? "text-forest" : "text-ink")}>
+                  <span
+                    className={cn(
+                      "numeral mt-1 text-[2.25rem] leading-none tracking-[-0.03em]",
+                      isToday ? "text-forest" : "text-ink",
+                    )}
+                  >
                     {String(d.day).padStart(2, "0")}
                   </span>
                   <span className="tabular mt-2 text-[0.8125rem] text-muted">

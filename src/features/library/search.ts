@@ -65,7 +65,13 @@ export async function searchLibrary(query: string, limitPerRecord = 5): Promise<
       }
     };
     push("title", record.title);
-    const meta = [record.sermon?.preacher, record.sermon?.scripture, record.sermon?.theme, record.sermon?.event, ...record.tags]
+    const meta = [
+      record.sermon?.preacher,
+      record.sermon?.scripture,
+      record.sermon?.theme,
+      record.sermon?.event,
+      ...record.tags,
+    ]
       .filter(Boolean)
       .join(" · ");
     if (local.length < limitPerRecord && meta) push("meta", meta);
@@ -79,7 +85,11 @@ export async function searchLibrary(query: string, limitPerRecord = 5): Promise<
     }
     const refl = rById.get(record.id);
     if (refl && local.length < limitPerRecord) {
-      const notes = [...Object.values(refl.sections), ...Object.values(refl.study), ...Object.values(refl.segmentNotes)]
+      const notes = [
+        ...Object.values(refl.sections),
+        ...Object.values(refl.study),
+        ...Object.values(refl.segmentNotes),
+      ]
         .filter(Boolean)
         .join("\n");
       if (notes) push("note", notes);

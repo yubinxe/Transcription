@@ -72,7 +72,8 @@ export const youtubeOAuthProvider: TranscriptProvider = {
   canHandle: (input) => input.kind === "youtube" && !!GOOGLE_CLIENT_ID,
   async transcribe(input: TranscriptInput, options: TranscriptionOptions = {}): Promise<TranscriptResult> {
     if (input.kind !== "youtube") throw new TranscriptionError("invalid_input", "YouTube 링크가 필요합니다.");
-    if (!GOOGLE_CLIENT_ID) throw new TranscriptionError("provider_disabled", "Google OAuth가 구성되지 않았습니다.");
+    if (!GOOGLE_CLIENT_ID)
+      throw new TranscriptionError("provider_disabled", "Google OAuth가 구성되지 않았습니다.");
     options.onStage?.("checking_captions");
     const access = await getToken();
     const headers = { Authorization: `Bearer ${access}` };
@@ -80,7 +81,11 @@ export const youtubeOAuthProvider: TranscriptProvider = {
       `https://www.googleapis.com/youtube/v3/captions?part=snippet&videoId=${encodeURIComponent(input.videoId)}`,
       { headers, signal: options.signal },
     );
-    if (list.status === 403) throw new TranscriptionError("caption_forbidden", "이 영상의 자막을 내려받을 권한이 없습니다. 내 채널 영상에서만 가능합니다.");
+    if (list.status === 403)
+      throw new TranscriptionError(
+        "caption_forbidden",
+        "이 영상의 자막을 내려받을 권한이 없습니다. 내 채널 영상에서만 가능합니다.",
+      );
     if (list.status === 404) throw new TranscriptionError("video_unavailable", "영상을 찾을 수 없습니다.");
     if (!list.ok) throw new TranscriptionError("network", `YouTube API 오류 (${list.status})`);
     const data = (await list.json()) as {
@@ -93,11 +98,15 @@ export const youtubeOAuthProvider: TranscriptProvider = {
       items[0];
     if (!pick) throw new TranscriptionError("no_captions", "이 영상에는 자막 트랙이 없습니다.");
     options.onStage?.("loading_captions");
-    const dl = await fetch(`https://www.googleapis.com/youtube/v3/captions/${encodeURIComponent(pick.id)}?tfmt=vtt`, {
-      headers,
-      signal: options.signal,
-    });
-    if (dl.status === 403) throw new TranscriptionError("caption_forbidden", "이 자막을 내려받을 권한이 없습니다.");
+    const dl = await fetch(
+      `https://www.googleapis.com/youtube/v3/captions/${encodeURIComponent(pick.id)}?tfmt=vtt`,
+      {
+        headers,
+        signal: options.signal,
+      },
+    );
+    if (dl.status === 403)
+      throw new TranscriptionError("caption_forbidden", "이 자막을 내려받을 권한이 없습니다.");
     if (!dl.ok) throw new TranscriptionError("network", `자막 다운로드 오류 (${dl.status})`);
     const vtt = await dl.text();
     const segments = parseVtt(vtt).map((s) => ({ ...s, source: "youtube_caption" as const }));

@@ -5,12 +5,14 @@ import { cn } from "@/lib/utils/cn";
 /** Minimal accessible popover: click to toggle, Esc / outside click to close, focus returns. */
 export function Popover({
   label,
+  ariaLabel,
   children,
   align = "end",
   buttonClassName,
   panelClassName,
 }: {
   label: ReactNode;
+  ariaLabel?: string;
   children: ReactNode | ((close: () => void) => ReactNode);
   align?: "start" | "end";
   buttonClassName?: string;
@@ -45,6 +47,7 @@ export function Popover({
         ref={btn}
         type="button"
         aria-expanded={open}
+        aria-label={ariaLabel}
         aria-controls={id}
         onClick={() => setOpen((o) => !o)}
         className={cn("btn btn-text btn-sm", buttonClassName)}

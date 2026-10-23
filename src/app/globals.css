@@ -19,7 +19,9 @@
   --color-rule: #d9d6ce;
   --color-danger: #9b3b2f;
 
-  --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
+  --font-sans:
+    "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
+    "Noto Sans KR", system-ui, sans-serif;
   --font-serif: "MaruBuri", "Nanum Myeongjo", "Noto Serif KR", "AppleMyungjo", serif;
   --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
 
@@ -43,7 +45,9 @@
     background: var(--color-canvas);
     color: var(--color-ink);
     font-family: var(--font-sans);
-    font-feature-settings: "ss06", "tnum" 0;
+    font-feature-settings:
+      "ss06",
+      "tnum" 0;
     word-break: keep-all;
     overflow-wrap: anywhere;
     line-break: strict;
@@ -98,6 +102,13 @@
     letter-spacing: var(--text-eyebrow--letter-spacing);
     text-transform: uppercase;
     font-weight: 500;
+    color: var(--color-muted);
+  }
+  /* Korean small labels: no wide tracking (Hangul does not take letter-spacing well) */
+  .label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
     color: var(--color-muted);
   }
   .serif {
@@ -176,7 +187,9 @@
     text-decoration-color: var(--color-rule);
     text-underline-offset: 0.3em;
     text-decoration-thickness: 1px;
-    transition: text-decoration-color 160ms var(--ease-quiet), color 160ms var(--ease-quiet);
+    transition:
+      text-decoration-color 160ms var(--ease-quiet),
+      color 160ms var(--ease-quiet);
   }
   .link-quiet:hover {
     text-decoration-color: var(--color-forest);
@@ -190,7 +203,9 @@
     border-radius: var(--radius-hair);
     padding: 0.625rem 0.75rem;
     font-size: 0.9375rem;
-    transition: border-color 160ms var(--ease-quiet), box-shadow 160ms var(--ease-quiet);
+    transition:
+      border-color 160ms var(--ease-quiet),
+      box-shadow 160ms var(--ease-quiet);
   }
   .field:hover {
     border-color: var(--color-faint);
@@ -232,7 +247,9 @@
     min-height: 2.25rem;
     font-size: 0.8125rem;
     color: var(--color-ink-soft);
-    transition: background-color 150ms var(--ease-quiet), color 150ms var(--ease-quiet);
+    transition:
+      background-color 150ms var(--ease-quiet),
+      color 150ms var(--ease-quiet);
   }
   .segmented > button + button {
     border-left: 1px solid var(--color-rule);
@@ -254,7 +271,9 @@
   }
   .seg {
     border-radius: 2px;
-    transition: background-color 220ms var(--ease-quiet), box-shadow 220ms var(--ease-quiet);
+    transition:
+      background-color 220ms var(--ease-quiet),
+      box-shadow 220ms var(--ease-quiet);
     box-decoration-break: clone;
     -webkit-box-decoration-break: clone;
   }

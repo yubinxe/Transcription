@@ -37,7 +37,12 @@ export function Dropzone({
       )}
     >
       {children}
-      <button type="button" className="btn btn-quiet btn-sm" onClick={() => inputRef.current?.click()} disabled={disabled}>
+      <button
+        type="button"
+        className="btn btn-quiet btn-sm"
+        onClick={() => inputRef.current?.click()}
+        disabled={disabled}
+      >
         {label}
       </button>
       <input

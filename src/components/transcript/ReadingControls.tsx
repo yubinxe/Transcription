@@ -4,16 +4,27 @@ import { Minus, Plus } from "lucide-react";
 
 export function ReadingControls({ hasTiming }: { hasTiming: boolean }) {
   const { reading } = usePreferences();
-  const set = (patch: Partial<typeof reading>) => setPreferences((p) => ({ ...p, reading: { ...p.reading, ...patch } }));
+  const set = (patch: Partial<typeof reading>) =>
+    setPreferences((p) => ({ ...p, reading: { ...p.reading, ...patch } }));
   return (
     <div className="w-[18rem] space-y-5 text-[0.8125rem]">
       <Row label="글자 크기">
         <div className="flex items-center gap-1">
-          <button type="button" className="btn btn-quiet btn-sm !px-2" aria-label="글자 작게" onClick={() => set({ fontSize: Math.max(15, reading.fontSize - 1) })}>
+          <button
+            type="button"
+            className="btn btn-quiet btn-sm !px-2"
+            aria-label="글자 작게"
+            onClick={() => set({ fontSize: Math.max(15, reading.fontSize - 1) })}
+          >
             <Minus className="size-3.5" aria-hidden />
           </button>
           <span className="tabular w-10 text-center">{reading.fontSize}px</span>
-          <button type="button" className="btn btn-quiet btn-sm !px-2" aria-label="글자 크게" onClick={() => set({ fontSize: Math.min(24, reading.fontSize + 1) })}>
+          <button
+            type="button"
+            className="btn btn-quiet btn-sm !px-2"
+            aria-label="글자 크게"
+            onClick={() => set({ fontSize: Math.min(24, reading.fontSize + 1) })}
+          >
             <Plus className="size-3.5" aria-hidden />
           </button>
         </div>
@@ -50,8 +61,18 @@ export function ReadingControls({ hasTiming }: { hasTiming: boolean }) {
           onChange={(v) => set({ mode: v as typeof reading.mode })}
         />
       </Row>
-      <Toggle label="타임스탬프 표시" checked={reading.showTimestamps} disabled={!hasTiming} onChange={(v) => set({ showTimestamps: v })} />
-      <Toggle label="재생 위치 따라가기" checked={reading.autoScroll} disabled={!hasTiming} onChange={(v) => set({ autoScroll: v })} />
+      <Toggle
+        label="타임스탬프 표시"
+        checked={reading.showTimestamps}
+        disabled={!hasTiming}
+        onChange={(v) => set({ showTimestamps: v })}
+      />
+      <Toggle
+        label="재생 위치 따라가기"
+        checked={reading.autoScroll}
+        disabled={!hasTiming}
+        onChange={(v) => set({ autoScroll: v })}
+      />
     </div>
   );
 }
@@ -65,7 +86,15 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
   );
 }
 
-function Seg({ value, options, onChange }: { value: string; options: Array<[string, string]>; onChange: (v: string) => void }) {
+function Seg({
+  value,
+  options,
+  onChange,
+}: {
+  value: string;
+  options: Array<[string, string]>;
+  onChange: (v: string) => void;
+}) {
   return (
     <div className="segmented">
       {options.map(([v, l]) => (
@@ -94,7 +123,9 @@ export function Toggle({
     <label className={`flex items-start justify-between gap-4 ${disabled ? "opacity-50" : "cursor-pointer"}`}>
       <span>
         <span className="block text-ink-soft">{label}</span>
-        {description && <span className="mt-1 block text-[0.75rem] leading-relaxed text-muted">{description}</span>}
+        {description && (
+          <span className="mt-1 block text-[0.75rem] leading-relaxed text-muted">{description}</span>
+        )}
       </span>
       <span className="relative mt-0.5 inline-flex shrink-0">
         <input

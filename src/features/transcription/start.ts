@@ -9,7 +9,10 @@ import { getPreferences } from "@/lib/storage/preferences";
 import type { TranscriptInput } from "@/types/transcript";
 
 function titleFromFile(name: string) {
-  return name.replace(/\.[^.]+$/, "").replace(/[_]+/g, " ").trim();
+  return name
+    .replace(/\.[^.]+$/, "")
+    .replace(/[_]+/g, " ")
+    .trim();
 }
 
 export async function readTextFile(file: File): Promise<string> {
@@ -43,7 +46,9 @@ export async function importText(opts: {
   let recordId = opts.recordId;
   if (!recordId) {
     const record = await createRecord({
-      title: opts.title || (opts.fileName ? titleFromFile(opts.fileName) : result.segments[0]?.text.slice(0, 40) ?? ""),
+      title:
+        opts.title ||
+        (opts.fileName ? titleFromFile(opts.fileName) : (result.segments[0]?.text.slice(0, 40) ?? "")),
       source: { type: opts.fileName ? "file" : "text", fileName: opts.fileName },
     });
     recordId = record.id;
@@ -54,7 +59,10 @@ export async function importText(opts: {
 }
 
 /** Starts on-device (or configured server) speech recognition. Returns immediately. */
-export async function startMediaTranscription(file: File, opts: { recordId?: string; collectionId?: string } = {}) {
+export async function startMediaTranscription(
+  file: File,
+  opts: { recordId?: string; collectionId?: string } = {},
+) {
   validateMediaFile(file);
   let recordId = opts.recordId;
   if (!recordId) {

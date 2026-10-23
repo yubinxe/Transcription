@@ -29,7 +29,10 @@ interface YTNamespace {
 let apiPromise: Promise<YTNamespace> | null = null;
 
 function loadApi(): Promise<YTNamespace> {
-  const w = window as unknown as { YT?: YTNamespace & { loaded?: number }; onYouTubeIframeAPIReady?: () => void };
+  const w = window as unknown as {
+    YT?: YTNamespace & { loaded?: number };
+    onYouTubeIframeAPIReady?: () => void;
+  };
   if (w.YT?.Player) return Promise.resolve(w.YT);
   if (apiPromise) return apiPromise;
   apiPromise = new Promise((resolve, reject) => {
@@ -59,7 +62,15 @@ const ERRORS: Record<number, string> = {
   153: "재생 환경 정보를 확인하지 못해 영상을 불러오지 못했습니다.",
 };
 
-export function YouTubePlayer({ videoId, store, title }: { videoId: string; store: PlayerStore; title: string }) {
+export function YouTubePlayer({
+  videoId,
+  store,
+  title,
+}: {
+  videoId: string;
+  store: PlayerStore;
+  title: string;
+}) {
   const hostRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -74,7 +85,14 @@ export function YouTubePlayer({ videoId, store, title }: { videoId: string; stor
         player = new YT.Player(mount, {
           videoId,
           host: "https://www.youtube-nocookie.com",
-          playerVars: { rel: 0, modestbranding: 1, playsinline: 1, hl: "ko", cc_load_policy: 0, origin: window.location.origin },
+          playerVars: {
+            rel: 0,
+            modestbranding: 1,
+            playsinline: 1,
+            hl: "ko",
+            cc_load_policy: 0,
+            origin: window.location.origin,
+          },
           events: {
             onReady: (e) => {
               const p = e.target;
@@ -112,7 +130,10 @@ export function YouTubePlayer({ videoId, store, title }: { videoId: string; stor
     <div className="relative aspect-video w-full overflow-hidden bg-[#1d201c]">
       <div ref={hostRef} className="absolute inset-0 [&_iframe]:size-full" />
       {error && (
-        <div role="alert" className="absolute inset-0 flex items-center justify-center bg-[#1d201c] p-6 text-center text-[0.875rem] leading-relaxed text-[#e9e6de]">
+        <div
+          role="alert"
+          className="absolute inset-0 flex items-center justify-center bg-[#1d201c] p-6 text-center text-[0.875rem] leading-relaxed text-[#e9e6de]"
+        >
           {error}
         </div>
       )}

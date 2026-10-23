@@ -97,9 +97,8 @@ export function parsePlainText(content: string, source: SegmentSource = "manual"
     const sentences = splitSentences(para);
     sentences.forEach((s, i) => {
       // Mark paragraph starts so the reader can rebuild paragraphs.
-      cues.push({ startMs: null, endMs: null, text: i === 0 && cues.length > 0 ? ` ${s}` : s });
+      cues.push({ startMs: null, endMs: null, text: s, paragraphStart: i === 0 && cues.length > 0 });
     });
   }
   return normalizeCues(cues, source);
 }
-
